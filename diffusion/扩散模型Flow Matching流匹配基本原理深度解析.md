@@ -214,7 +214,7 @@ $$
 
 类比 score matching 的损失函数，
 $$
-\mathcal{L}=\mathbb{E}_{\cdots}||S_\theta(x)-\nabla xlog(x)||^2
+\mathcal{L}=\mathbb{E}_{\cdots}||S_\theta(x)-\nabla_x log(x)||^2
 $$
 Flow matching 的损失函数
 $$
