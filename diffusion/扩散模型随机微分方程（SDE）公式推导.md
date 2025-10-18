@@ -131,7 +131,7 @@ $$
 \begin{align*}
 p(x_t|x_{t+\Delta t})=\exp\Big(&-\frac{(x_{t+\Delta t}-x_t-f_t(x_t)\Delta t)^2}{2g_t^2 \Delta t} \\
 &- (x_{t+\Delta t}-x_t)\nabla_x \log p(x_t) \\
-&- \Delta t \nabla_t \log p(x_t)\Big) \tag{9}
+&- \Delta t \nabla_t \log p(x_t)\Big) \tag{11}
 \end{align*}
 $$
 
@@ -226,10 +226,25 @@ $$
 由 $\Delta t \to 0$，得：
 
 $$
-\Rightarrow \quad dx_t = \big[f_{t}(x_t) - g_{t}^2 \nabla_x \log p(x_{t}) \big]dt + g_{t} d\overline{w}
+\Rightarrow \quad \boxed{dx_t = \big[f_{t}(x_t) - g_{t}^2 \nabla_x \log p(x_{t}) \big]dt + g_{t} d\overline{w}} \tag{12}
 $$
 
 其中 $\overline{w}$ 是逆向 wiener 过程。
 其中 $\nabla_x \log p(x_{t})$ 即为 score function。
 这就是扩散模型与 score-based 生成模型在连续形式下的核心联系。
+
+# DDPM 与 Score Matching 的 SDE 表达形式
+
+> SDE 变为 pfODE 从而实现跳步。
+
+SDE 前向公式：
+$$
+\boxed{dx_t=f_t(x_t)dt + g_tdW_t} \tag{2}
+$$
+即：
+$$
+dx_t=f(x_t, t)dt + g(t)dW_t,\\
+dW_t=\sqrt{dt}\varepsilon,\\
+\varepsilon \sim \mathcal{N}(0,I)
+$$
 
