@@ -229,9 +229,39 @@ $$
 \Rightarrow \quad \boxed{dx_t = \big[f_{t}(x_t) - g_{t}^2 \nabla_x \log p(x_{t}) \big]dt + g_{t} d\overline{w}} \tag{12}
 $$
 
+另一种写法：
+$$
+\boxed{%
+dx_t = \bigl[f(x_t,t) - g(t)^2\nabla_x \log p_t(x_t)\bigr]dt + g(t)d\overline{w}_t
+}
+$$
+
 其中 $\overline{w}$ 是逆向 wiener 过程。
 其中 $\nabla_x \log p(x_{t})$ 即为 score function。
 这就是扩散模型与 score-based 生成模型在连续形式下的核心联系。
+
+> 对应的概率流（deterministic probability flow）ODE 去掉噪声项为
+>$$
+\boxed{%
+\frac{d x_t}{dt} = f(x_t,t) - \tfrac{1}{2}g(t)^2\nabla_x\log p_t(x_t)
+}
+>$$
+>这个 ODE 在分布演化上與上面的 SDE 保持相同的边际分布路径，但为确定性积分常用于生成样本的可逆映射。
+
+
+## 在实际算法中（用可学习的 score）
+
+通常我们并不知道真实的 $\nabla_x\log p_t(x)$，所以用一个参数化网络 $s_\theta(x,t)$ 来近似：
+$$
+\nabla_x\log p_t(x) \approx s_\theta(x,t).
+$$
+把它代入反向 SDE 或概率流 ODE：
+$$
+dx_t = \bigl[f(x_t,t) - g(t)^2 s_\theta(x_t,t)\bigr]dt + g(t)d\overline w_t, \\
+\quad\text{或}\quad
+\frac{dx_t}{dt}=f(x_t,t)-\tfrac12 g(t)^2 s_\theta(x_t,t).
+$$
+
 
 # DDPM 与 Score Matching 的 SDE 表达形式
 
