@@ -2,7 +2,9 @@
 
 常微分方程（ODE, Ordinary Differential Equation）的标准形式之一确实就是：
 
-$$dx_t=f_t(x_t)dt \tag{1}$$ 
+$$
+dx_t=f_t(x_t)dt \tag{1}
+$$ 
 
 或者更常见地写作：
 
@@ -263,13 +265,13 @@ dx_t = \bigl[f(x_t,t) - g(t)^2 s_\theta(x_t,t)\bigr]dt + g(t)d\overline w_t, \\
 $$
 
 
-# DDPM 与 Score Matching 的 SDE 表达形式
+# 扩散模型 前向加噪公式的 SDE 表达形式
 
 > SDE 变为 pfODE 从而实现跳步。
 
 SDE 前向公式：
 $$
-\boxed{dx_t=f_t(x_t)dt + g_tdW_t} \tag{2}
+\boxed{dx_t=f_t(x_t)dt + g_tdW_t} \tag{13}
 $$
 即：
 $$
@@ -277,4 +279,109 @@ dx_t=f(x_t, t)dt + g(t)dW_t,\\
 dW_t=\sqrt{dt}\varepsilon,\\
 \varepsilon \sim \mathcal{N}(0,I)
 $$
+
+离散化：
+
+$$
+x_t=x_{t-\Delta t} + \boxed{\phantom{x}}\ \Delta t + \boxed{\phantom{x}}\ \Delta W, \quad \Delta W=\sqrt{\Delta t}\varepsilon \tag{14}
+$$
+
+## 1. DDPM
+
+前向 (加噪) 公式：
+$$
+x_t=\sqrt{1-\beta_t}x_{t-1}+\sqrt{\beta_t}\varepsilon \tag{15}
+$$
+$$
+\begin{align*}
+x(t)&=\sqrt{1-\beta(t)}x(t-1)+\sqrt{\beta(t)}\varepsilon \\
+&=\sqrt{1-\beta(t)}x(t-1)+\sqrt{\frac{\beta(t)}{\Delta t}}\sqrt{\Delta t}\varepsilon \tag{16}
+\end{align*}
+$$
+
+把 $\sqrt{1-x}$ 在 $x=0$ 处泰勒展开，
+$$
+\sqrt{1-x}=1-\frac{1}{2\sqrt{1-0}}(x-0)=1-\frac{x}{2}
+$$
+代入 (15)，
+$$
+\begin{align*}
+x(t)&=[1-\frac{\beta(t)}{2}]x(t-1)+\sqrt{\frac{\beta(t)}{\Delta t}}\sqrt{\Delta t}\varepsilon \\
+&=x(t-1)-\frac{\beta(t)}{2}x(t-1)+\sqrt{\frac{\beta(t)}{\Delta t}}\sqrt{\Delta t}\varepsilon
+\end{align*}
+$$
+此时与 (14) 对齐，令 $\Delta t=1$，
+$$
+\begin{align*}
+x(t)&=x(t-\Delta t)-\frac{\beta(t)}{2}x(t-\Delta t)+\sqrt{\frac{\beta(t)}{\Delta t}}\Delta W \\
+x(t)-x(t-\Delta t)&=-\frac{\beta(t)}{2 \Delta t}x(t-\Delta t)\Delta t+\sqrt{\frac{\beta(t)}{\Delta t}}\Delta W
+\end{align*}
+$$
+令 $\frac{\beta(t)}{ \Delta t}=\overline\beta(t)$，
+$$
+\begin{align*}
+x(t)-x(t-\Delta t)&=-\frac{\overline\beta(t)}{2}x(t-\Delta t)\Delta t+\sqrt{\overline\beta(t)}\Delta W \\
+dx(t)&=-\frac{\overline\beta(t)}{2}x(t)dt+\sqrt{\overline\beta(t)}d W
+\end{align*}
+$$
+此时已经可与 (13) 对齐，$f(x_t,t)=-\frac{\overline\beta(t)}{2}x(t)$，$g(t)=\sqrt{\overline\beta(t)}$
+
+## 2. Score Matching
+
+加噪公式：
+$$
+\begin{align*}
+x(t)&=x+\sigma(t)\varepsilon, \quad x\sim P_{data} \\
+x(t+\Delta t)&=x+\sigma(t+\Delta t)\varepsilon
+\end{align*}
+$$
+
+分布：
+$$
+x(t)\sim \mathcal{N}(x,\ \sigma^2(t)I) \\
+x(t+\Delta t) \sim \mathcal{N}(x,\ \sigma^2(t+\Delta t)I)
+$$
+
+从 $x(t) \to x(t+\Delta t)$ 需要加上分布 $\mathcal{N}\Big(0,\ \big[\sigma^2(t+\Delta t)-\sigma^2(t)\big]I\Big)$ :
+
+$$
+\begin{align*}
+x(t+\Delta t)&=x(t) + \sqrt{\sigma^2(t+\Delta t)-\sigma^2(t)}\varepsilon \\
+x(t+\Delta t) - x(t) &=  \sqrt{\frac{\sigma^2(t+\Delta t)-\sigma^2(t)}{\Delta t}}\sqrt{\Delta t}\varepsilon \\
+dx(t)&=\sqrt{\frac{d\sigma^2{t}}{dt}}dW
+\end{align*}
+$$
+
+此时已经可与 (13) 对齐，即：
+$$
+f(x_t,t)=0, \quad g(t)=\sqrt{\frac{d\sigma^2{t}}{dt}}
+$$
+
+对应一致性模型里的：
+$$
+f(x_t,t)=0, \quad g(t)=\sqrt{2t}
+$$
+
+## 3. 从 SDE 前向公式到扩散模型
+
+求加噪的均值 $\mu$ 和方差 $\sigma$：
+
+$$
+p(x_t|x_0)\sim \mathcal{N}(x_t;\ \mu,\ \sigma^2 I)
+$$
+
+
+SDE 前向公式：
+$$
+\boxed{dx_t=f(x_t, t)dt + g(t)dW_t}\ ,\\
+dW_t=\sqrt{dt}\varepsilon,\\
+\varepsilon \sim \mathcal{N}(0,I)
+$$
+
+Ito 过程，引理：$\forall \phi(x_t,t)$
+$$
+d\phi=\frac{\partial \phi}{\partial t}dt+\sum_i \frac{\partial \phi}{\partial x_i}dx_i+\frac{1}{2}\sum_{ij}\frac{\partial^2 \phi}{\partial x_i \partial y_i}dx_i dx_j
+$$
+
+其中 $x_t$ 表示向量，$x_i,x_j,\cdots$ 是标量，表示 $x_t$ 中的一个元素。
 
