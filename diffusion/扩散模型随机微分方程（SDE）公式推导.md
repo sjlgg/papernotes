@@ -362,7 +362,7 @@ $$
 f(x_t,t)=0, \quad g(t)=\sqrt{2t}
 $$
 
-## 3. 从 SDE 前向公式到扩散模型
+## 3. 从 SDE 前向公式到扩散模型 加噪公式
 
 求加噪的均值 $\mu$ 和方差 $\sigma$：
 
@@ -384,4 +384,35 @@ d\phi=\frac{\partial \phi}{\partial t}dt+\sum_i \frac{\partial \phi}{\partial x_
 $$
 
 其中 $x_t$ 表示向量，$x_i,x_j,\cdots$ 是标量，表示 $x_t$ 中的一个元素。
+
+$dx_i, dx_j$ 也是随机变量，
+
+$$
+dx_i=f_i(x_t,t)dt+g(t)dW \\
+dx_j=f_j(x_t,t)dt+g(t)dW \\
+dx_idy_i=f_i(x_t,t)f_j(x_t,t)(dt)^2+f_i(x_t,t)dt\cdot g(t)dW \\
++f_j(x_t,t)dt\cdot g(t)dW + g^2(t)(dW)^2
+$$
+
+其中 第一项 $\approx 0$，
+
+求 $(dW)^2$ 均值和方差
+
+$$
+dW=\sqrt{dt}\varepsilon
+$$
+
+$$
+\because E[(dW)^2]=E[dt\varepsilon^2]=dtE[\varepsilon^2] \\
+\because D(\varepsilon)=E[\varepsilon^2]-E^2[\varepsilon] \\
+\therefore E[(dW)^2]=dt
+$$
+
+$$
+\because D[(dW)^2]=D[dt\varepsilon^2]=(dt)^2D[\varepsilon^2]=0 \\
+\because (dt)^2\approx 0 \\
+\therefore D[(dW)^2]=0
+$$
+得到 $(dW)^2 $ 均值为 $dt$, 方差为 0。
+> 此处通过矩母函数可以求出 $D[\varepsilon^2]=2$，正常要用二次变差和均方收敛推上面的均值和方差
 
