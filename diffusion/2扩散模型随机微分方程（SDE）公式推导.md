@@ -364,7 +364,7 @@ $$
 
 ## 3. 从 SDE 前向公式到扩散模型 加噪公式
 
-求加噪的均值 $\mu$ 和方差 $\sigma$：
+要求加噪的均值 $\mu$ 和方差 $\sigma$：
 
 $$
 p(x_t|x_0)\sim \mathcal{N}(x_t;\ \mu,\ \sigma^2 I)
@@ -396,7 +396,7 @@ $$
 
 其中 第一项 $\approx 0$，
 
-求 $(dW)^2$ 均值和方差
+求第四项 $(dW)^2$ 均值和方差
 
 $$
 dW=\sqrt{dt}\varepsilon
@@ -415,4 +415,122 @@ $$
 $$
 得到 $(dW)^2 $ 均值为 $dt$, 方差为 0。
 > 此处通过矩母函数可以求出 $D[\varepsilon^2]=2$，正常要用二次变差和均方收敛推上面的均值和方差
+
+求第二、三项 $dt\cdot dW$，  
+由于 
+$$
+dW=\sqrt{dt}\varepsilon
+$$
+所以
+$$
+dt \cdot dW \approx 0 
+$$
+
+所以综上：
+$$
+dx_idy_i= {g^2(t)}dt
+$$
+
+则 
+$$
+d\phi=\frac{\partial \phi}{\partial t}dt+\sum_i [\frac{\partial \phi}{\partial x_i}f_i(x_t,t)dt]+\sum_{i}[\frac{\partial \phi}{\partial x_i}g(t)dW_t] \\
++\frac{1}{2}\sum_{ij}[\frac{\partial^2 \phi}{\partial x_i \partial x_j}g^2(t)dt]
+$$
+
+求
+
+$$
+dE[\phi]=E[\frac{\partial \phi}{\partial t}dt]+\sum_i E[\frac{\partial \phi}{\partial x_i}f_i(x_t,t)dt]+\sum_{i}E[\frac{\partial \phi}{\partial x_i}g(t)dW_t] \\
++\frac{1}{2}\sum_{ij}E[\frac{\partial^2 \phi}{\partial x_i \partial x_j}g^2(t)dt]
+$$
+
+其中，$dW_t$ 与其它项无关，所以
+
+$$
+E[\frac{\partial \phi}{\partial x_i}g(t)dW_t]=E[\frac{\partial \phi}{\partial x_i}g(t)]E[dW_t]
+$$
+
+其中，$E[dW_t]=E[\sqrt{d_t}\varepsilon]=0$，所以
+
+$$
+dE[\phi]=E[\frac{\partial \phi}{\partial t}dt]+\sum_i E[\frac{\partial \phi}{\partial x_i}f_i(x_t,t)dt] 
++\frac{1}{2}\sum_{ij}E[\frac{\partial^2 \phi}{\partial x_i \partial x_j}g^2(t)dt]
+$$
+$$
+\frac{dE[\phi]}{dt}=E[\frac{\partial \phi}{\partial t}]+\sum_i E[\frac{\partial \phi}{\partial x_i}f_i(x_t,t)] 
++\frac{1}{2}\sum_{ij}E[\frac{\partial^2 \phi}{\partial x_i \partial x_j}g^2(t)]
+$$
+
+
+而 Ito 过程 $\phi$ 与 $t$ 无关，所以
+$$
+\frac{\partial \phi}{\partial t}=0
+$$
+
+前面在 Ito 过程，提到过：引理：$\forall \phi(x_t,t)$，此处尝试令 $\phi(x_t,t)=x_t$，其中 $x_t$ 的每个分量是 $x_u$。所以
+
+$$
+\frac{\partial \phi}{\partial x_i}=\frac{\partial x_u}{\partial x_i}=
+\begin{cases}
+1, & i=u \\
+0, & i\neq u
+\end{cases}
+$$
+$$
+\frac{\partial^2 \phi}{\partial x_i \partial x_j}=0
+$$
+
+所以
+$$
+\frac{dE[\phi]}{dt}=\frac{dE[x_u]}{dt}=E[f_u(x_t,t)]
+$$
+
+令均值向量 $m(t)=E[x_t]$，
+
+$$
+\boxed{
+\frac{dm}{dt}=E[f(x_t,t)] \tag{17}
+}
+$$
+
+协方差：
+$
+\phi(x_t,t)=x_ux_v-m_t(t)m_v(t)
+$
+
+$$
+\begin{align*}
+\frac{\partial \phi}{\partial t}&=-E[f_u(x_t,t)]m_v(t)-m_u(t)E[f_u(x_t,t)] \\
+
+\frac{\partial \phi}{\partial x_i}&\Rightarrow
+\begin{cases}
+\frac{\partial \phi}{\partial x_u}=x_v, & i=u \\
+\frac{\partial \phi}{\partial x_v}=x_u, & i=v \\    
+\end{cases} \\
+
+\frac{\partial^2 \phi}{\partial x_i \partial x_j}&\Rightarrow
+\begin{cases}
+\frac{\partial^2 \phi}{\partial x_u \partial x_v}=1, & i=u,j=v \\
+\frac{\partial^2 \phi}{\partial x_v \partial x_u}=1, & i=v,j=u \\
+\end{cases}
+
+\end{align*}
+
+$$
+
+> 个人感觉二阶导这里如果 $i=j$ 那二阶导是 0，up主没说这个事。
+
+$$
+\frac{dE[\phi]}{dt}=E[(x_v-m_v(t))f_u(x_t,t)]+E[(x_u-m_u(t))f_v(x_t,t)]+E[g^2(t)]
+$$
+
+令协方差 $P(t)=E[(x_t-m(t))(x_t-m(t))^\top]$
+
+$$
+\boxed{
+\frac{dP}{dt}=E[f(x_t,t)(x_t-m)^\top]+E[(x_t-m)f(x_t,t)^\top+E[g^2(t)] \tag{18}
+}
+$$
+
+所以推导出 $p(x_t)$ 的均值和方差的微分形式，有什么用？
 
